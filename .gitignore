@@ -1,0 +1,11 @@
+# System and audit artifacts
+.DS_Store
+.audit-*.png
+
+# Local prototype outputs and dependencies
+活动广场原型/node_modules/
+活动广场原型/dist/
+活动广场原型/implementation-*.png
+
+# Superseded generated covers; the prototype uses public/assets/unsplash instead.
+活动广场原型/public/assets/covers/

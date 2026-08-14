@@ -11,5 +11,6 @@ When implementing from a selected generated mock, treat that image as the source
 - The seven filter dimensions are equal peers. Do not group, tint, accent, or otherwise imply priority among any subset of them.
 - This prototype is a 1920px-first desktop activity plaza. The shared visual system is white surfaces, restrained institutional blue, thin dividers, 72px page gutters, and 24px layout spacing.
 - Use Unsplash photos as semantic placeholder covers, downloaded into the project with a maximum image width of 900px. Do not use generated cover art in the prototype.
+- Both方案 A and方案 B must follow the shared design and component baseline in `../设计与组件规范.md`; plan-specific information architecture remains documented separately.
 
 Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts/prepare-sites-build.mjs`, and `tests/sites-worker.test.mjs` intact so the same local prototype can be handed to Sites. Before a Sites handoff, run `npm run build` and `npm run test:sites`; the build must leave `dist/client/index.html`, `dist/server/index.js`, and `dist/.openai/hosting.json`.

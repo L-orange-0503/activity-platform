@@ -12,13 +12,6 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     allowedHosts: ["terminal.local"],
-    fs: {
-      allow: [
-        ".",
-        "/Users/lishijiedemac/Desktop",
-        "/Users/lishijiedemac/Documents/图片库/设计素材.library/images/MSWO4M1EBL1HW.info",
-      ],
-    },
     warmup: {
       clientFiles: ["./src/main.jsx"],
     },

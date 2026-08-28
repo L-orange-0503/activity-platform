@@ -3,6 +3,8 @@ import { LuCalendarDays, LuCalendarRange, LuChevronDown, LuChevronUp, LuColumns3
 import { MobilePlaza } from "./MobilePlaza.jsx";
 import { MyActivitiesPage } from "./MyActivitiesPage.jsx";
 
+const withBasePath = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`;
+
 const primaryFilters = [
   { key: "format", label: "举办形式", options: ["全部", "线上", "线下", "线上+线下"] },
   { key: "status", label: "活动状态", options: ["全部", "报名中", "即将开始", "进行中", "已结束"] },
@@ -31,7 +33,7 @@ const activities = [
   { id: "a10", title: "青年夜校 · 手机影像创作与城市漫游", status: "报名中", category: "能力拓展", format: "线下", time: "近一个月", points: 8, region: "444", subRegion: "高新区", cover: "/assets/unsplash/volunteers.jpg", start: "2026-08-28 18:30", end: "2026-08-28 21:00", tags: ["影像创作", "城市漫游", "夜校"], organizer: "高新区青年发展中心", location: "高新区城市会客厅", signup: "22/40", views: "876", eligible: true, custom: ["请携带可拍照的移动设备", "含一次户外采风"], masonryLines: ["课程形式：讲解 + 城市采风", "建议自备充电宝", "报名后发送集合地点"], density: 7 },
   { id: "a11", title: "周末亲子科学实验室：一起发现身边的物理", status: "即将开始", category: "讲座活动", format: "线下", time: "周末", points: 5, region: "666", subRegion: "青羊区", cover: "/assets/unsplash/culture.jpg", start: "2026-08-23 10:00", end: "2026-08-23 11:30", tags: ["亲子活动", "科学启蒙"], organizer: "青羊区青少年宫", location: "青羊区科学体验馆", signup: "18/36", views: "462", eligible: true, custom: ["建议6—12岁儿童参与"], masonryLines: ["建议年龄：6—12岁", "每组限1位家长陪同"], density: 4 },
   { id: "a12", title: "校园音乐午间场：轻松聆听室内乐", status: "进行中", category: "素质提升活动", format: "线下", time: "今天", points: 2, region: "333", subRegion: "武侯区", cover: "/assets/unsplash/students.jpg", start: "2026-08-14 12:20", end: "2026-08-14 13:00", tags: ["音乐欣赏", "校园美育"], organizer: "校园艺术中心", location: "武侯区大学生活动中心", signup: "64/100", views: "1,128", eligible: true, custom: [], density: 2 },
-];
+].map((activity) => ({ ...activity, cover: withBasePath(activity.cover) }));
 
 function StatusBadge({ status }) { return <span className={`status status-${status}`}>{status}</span>; }
 function FilterRow({ row, filters, onChange }) { return <div className={`filter-row filter-row-${row.key}`}><span className="filter-label">{row.label}</span><div className="filter-options" role="group" aria-label={row.label}>{row.options.map((option) => <button key={option} className={filters[row.key] === option ? "active" : ""} type="button" aria-pressed={filters[row.key] === option} onClick={() => onChange(row.key, option)}>{option}</button>)}</div></div>; }

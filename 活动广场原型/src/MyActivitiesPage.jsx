@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { LuCalendarDays, LuChevronDown, LuEllipsis, LuHeartOff, LuMapPin, LuPlus, LuScanLine, LuSearch, LuTrash2, LuX } from "react-icons/lu";
 
+const withBasePath = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`;
+
 const records = [
   { id: "my-01", title: "阅读经典 · 悦读人生——校园读书分享会", status: "ongoing", start: "2026-08-14 14:00", end: "2026-08-14 17:00", location: "武侯区图书馆三楼多功能厅", cover: "/assets/unsplash/reading.jpg", relations: ["joined", "favorited", "managed"] },
   { id: "my-02", title: "校园绿色行动日：一起为校园种下一棵树", status: "not_started", start: "2026-08-16 09:00", end: "2026-08-16 12:00", location: "金牛区青年公园东门", cover: "/assets/unsplash/mountains.jpg", relations: ["joined", "favorited"] },
@@ -14,7 +16,7 @@ const records = [
   { id: "my-10", title: "青年夜校 · 手机影像创作与城市漫游", status: "ended", start: "2026-08-28 18:30", end: "2026-08-28 21:00", location: "高新区城市会客厅", cover: "/assets/unsplash/volunteers.jpg", relations: ["joined", "favorited", "managed"] },
   { id: "my-11", title: "周末亲子科学实验室：一起发现身边的物理", status: "reviewing", start: "2026-08-23 10:00", end: "2026-08-23 11:30", location: "青羊区科学体验馆", cover: "/assets/unsplash/culture.jpg", relations: ["joined", "favorited"] },
   { id: "my-12", title: "校园音乐午间场：轻松聆听室内乐", status: "ended", start: "2026-08-14 12:20", end: "2026-08-14 13:00", location: "武侯区大学生活动中心", cover: "/assets/unsplash/students.jpg", relations: ["joined", "managed"] },
-];
+].map((record) => ({ ...record, cover: withBasePath(record.cover) }));
 
 const tabs = [
   { id: "joined", label: "我报名的", empty: "暂未报名活动" },

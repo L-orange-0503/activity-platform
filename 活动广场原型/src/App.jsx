@@ -1,183 +1,85 @@
-import { useMemo, useState } from "react";
-import {
-  LuCalendarDays,
-  LuChevronRight,
-  LuColumns3,
-  LuEye,
-  LuGrid2X2,
-  LuLayoutList,
-  LuMapPin,
-  LuRotateCcw,
-  LuSearch,
-  LuUser,
-  LuUsers,
-  LuX,
-} from "react-icons/lu";
+import { useEffect, useMemo, useState } from "react";
+import { LuCalendarDays, LuCalendarRange, LuChevronDown, LuChevronUp, LuColumns3, LuEye, LuGrid2X2, LuLayoutList, LuMapPin, LuRotateCcw, LuSearch, LuSlidersHorizontal, LuUser, LuUsers, LuX } from "react-icons/lu";
+import { MobilePlaza } from "./MobilePlaza.jsx";
+import { MyActivitiesPage } from "./MyActivitiesPage.jsx";
 
-const filterRows = [
+const primaryFilters = [
   { key: "format", label: "举办形式", options: ["全部", "线上", "线下", "线上+线下"] },
-  { key: "status", label: "活动状态", options: ["全部", "即将开始", "进行中", "已结束"] },
+  { key: "status", label: "活动状态", options: ["全部", "报名中", "即将开始", "进行中", "已结束"] },
   { key: "category", label: "活动分类", options: ["全部", "能力拓展", "讲座活动", "阅读活动", "素质提升活动", "普法教育活动", "校园清洁志愿服务活动"] },
   { key: "time", label: "活动时间", options: ["全部", "今天", "明天", "周末", "最近一周", "最近两周", "近一个月", "近三个月", "选择日期"] },
+];
+const extendedFilters = [
   { key: "points", label: "考核积分", options: ["全部", "1~5", "6~10", "11~15", "16~20", "自定义"] },
   { key: "region", label: "区域", options: ["全部", "333", "222", "111", "666", "444", "555"] },
   { key: "subRegion", label: "所属区域", options: ["全部", "金牛区", "青羊区", "武侯区", "成华区", "高新区"] },
 ];
+const allFilters = [...primaryFilters, ...extendedFilters];
+const initialFilters = Object.fromEntries(allFilters.map(({ key }) => [key, "全部"]));
+const availableSubRegions = { "333": ["金牛区", "武侯区"], "222": ["金牛区", "高新区"], "111": ["成华区"], "666": ["青羊区"], "444": ["高新区"], "555": ["武侯区"] };
 
 const activities = [
-  {
-    id: "a1", title: "阅读经典 · 悦读人生——校园读书分享会", status: "进行中", category: "阅读活动", format: "线下", time: "最近一周", points: 5, region: "333", subRegion: "武侯区", cover: "/assets/unsplash/reading.jpg", start: "2026-08-14 14:00", end: "2026-08-14 17:00", tags: ["阅读活动", "能力拓展"], organizer: "市图书馆阅读推广中心", location: "武侯区图书馆三楼多功能厅", signup: "72/120", views: "1,860", eligible: true, custom: ["面向对象：全体在校学生"], masonryLines: ["适合人群：全体在校学生"], density: 3,
-  },
-  {
-    id: "a2", title: "校园绿色行动日：一起为校园种下一棵树", status: "报名中", category: "校园清洁志愿服务活动", format: "线下", time: "周末", points: 10, region: "222", subRegion: "金牛区", cover: "/assets/unsplash/mountains.jpg", start: "2026-08-16 09:00", end: "2026-08-16 12:00", tags: ["志愿服务", "素质提升活动"], organizer: "绿色校园社团", location: "金牛区青年公园东门", signup: "36/60", views: "980", eligible: true, custom: ["需自备水杯", "提供志愿服务证明"], masonryLines: ["报名截止：8月15日 18:00", "服务时长：3小时"], density: 5,
-  },
-  {
-    id: "a3", title: "青少年心理健康与情绪管理公益讲座", status: "即将开始", category: "讲座活动", format: "线上+线下", time: "明天", points: 2, region: "111", subRegion: "成华区", cover: "/assets/unsplash/volunteers.jpg", start: "2026-08-15 19:00", end: "2026-08-15 20:30", tags: ["心理健康", "公益科普"], organizer: "成华区文化馆", location: "成华区文化报告厅 · 同步直播", signup: "48/200", views: "760", eligible: true, custom: ["主讲人：刘老师", "支持线上回看"], density: 4,
-  },
-  {
-    id: "a4", title: "传统文化体验日：非遗手作与器物之美", status: "进行中", category: "能力拓展", format: "线下", time: "最近两周", points: 15, region: "666", subRegion: "青羊区", cover: "/assets/unsplash/culture.jpg", start: "2026-08-18 09:30", end: "2026-08-18 16:30", tags: ["传统文化", "手作体验", "非遗"], organizer: "青羊区文化馆", location: "青羊区文化中心工坊", signup: "18/30", views: "1,240", eligible: false, custom: ["包含三项手作体验", "材料包现场领取", "适合 12 岁以上参与"], masonryLines: ["活动亮点：三项手作体验", "材料包：现场领取", "适合年龄：12岁以上"], density: 6,
-  },
-  {
-    id: "a5", title: "青春在场：城市公共文化志愿服务培训", status: "即将开始", category: "素质提升活动", format: "线上", time: "近一个月", points: 8, region: "444", subRegion: "高新区", cover: "/assets/unsplash/students.jpg", start: "2026-08-21 14:00", end: "2026-08-21 16:00", tags: ["志愿服务", "线上培训"], organizer: "高新区青年发展中心", location: "线上活动 · 直播课堂", signup: "126/300", views: "654", eligible: true, custom: ["报名后获取直播链接"], density: 3,
-  },
-  {
-    id: "a6", title: "山河同读：人文与自然主题阅读计划", status: "报名中", category: "阅读活动", format: "线上+线下", time: "近三个月", points: 12, region: "555", subRegion: "武侯区", cover: "/assets/unsplash/mountains.jpg", start: "2026-09-01 10:00", end: "2026-09-30 18:00", tags: ["人文阅读", "自然教育"], organizer: "城市阅读联盟", location: "武侯区多所图书馆及线上社群", signup: "95/150", views: "2,416", eligible: true, custom: ["含四次主题导读", "结业可获电子证书"], masonryLines: ["计划周期：9月1日—9月30日", "完成四次导读即可结业"], density: 5,
-  },
-  {
-    id: "a7", title: "美好社区共创工作坊", status: "进行中", category: "普法教育活动", format: "线下", time: "最近一周", points: 6, region: "333", subRegion: "金牛区", cover: "/assets/unsplash/volunteers.jpg", start: "2026-08-17 10:00", end: "2026-08-17 12:00", tags: ["社区治理", "公众参与"], organizer: "金牛区社区学院", location: "金牛区邻里中心", signup: "24/40", views: "388", eligible: false, custom: [], density: 2,
-  },
-  {
-    id: "a8", title: "秋日校园摄影采风与影像叙事基础课", status: "已结束", category: "能力拓展", format: "线下", time: "全部", points: 10, region: "222", subRegion: "高新区", cover: "/assets/unsplash/culture.jpg", start: "2026-08-06 09:00", end: "2026-08-06 16:00", tags: ["影像创作", "校园美育"], organizer: "校园艺术中心", location: "高新区大学城创意空间", signup: "30/30", views: "1,045", eligible: false, custom: ["请自备拍摄设备"], density: 4,
-  },
-  {
-    id: "a9", title: "城市公共安全微课堂：应急技能入门", status: "即将开始", category: "普法教育活动", format: "线上", time: "今天", points: 3, region: "111", subRegion: "成华区", cover: "/assets/unsplash/students.jpg", start: "2026-08-14 19:30", end: "2026-08-14 20:30", tags: ["公共安全", "线上课堂"], organizer: "成华区应急服务中心", location: "线上直播间", signup: "156/240", views: "529", eligible: true, custom: ["直播结束后可查看回放"], density: 2,
-  },
-  {
-    id: "a10", title: "青年夜校 · 手机影像创作与城市漫游", status: "报名中", category: "能力拓展", format: "线下", time: "近一个月", points: 8, region: "444", subRegion: "高新区", cover: "/assets/unsplash/volunteers.jpg", start: "2026-08-28 18:30", end: "2026-08-28 21:00", tags: ["影像创作", "城市漫游", "夜校"], organizer: "高新区青年发展中心", location: "高新区城市会客厅", signup: "22/40", views: "876", eligible: true, custom: ["请携带可拍照的移动设备", "含一次户外采风"], masonryLines: ["课程形式：讲解 + 城市采风", "建议自备充电宝", "报名后发送集合地点"], density: 7,
-  },
-  {
-    id: "a11", title: "周末亲子科学实验室：一起发现身边的物理", status: "即将开始", category: "讲座活动", format: "线下", time: "周末", points: 5, region: "666", subRegion: "青羊区", cover: "/assets/unsplash/culture.jpg", start: "2026-08-23 10:00", end: "2026-08-23 11:30", tags: ["亲子活动", "科学启蒙"], organizer: "青羊区青少年宫", location: "青羊区科学体验馆", signup: "18/36", views: "462", eligible: true, custom: ["建议6—12岁儿童参与"], masonryLines: ["建议年龄：6—12岁", "每组限1位家长陪同"], density: 4,
-  },
-  {
-    id: "a12", title: "校园音乐午间场：轻松聆听室内乐", status: "进行中", category: "素质提升活动", format: "线下", time: "今天", points: 2, region: "333", subRegion: "武侯区", cover: "/assets/unsplash/students.jpg", start: "2026-08-14 12:20", end: "2026-08-14 13:00", tags: ["音乐欣赏", "校园美育"], organizer: "校园艺术中心", location: "武侯区大学生活动中心", signup: "64/100", views: "1,128", eligible: true, custom: [], density: 2,
-  },
+  { id: "a1", title: "阅读经典 · 悦读人生——校园读书分享会", status: "进行中", category: "阅读活动", format: "线下", time: "最近一周", points: 5, region: "333", subRegion: "武侯区", cover: "/assets/unsplash/reading.jpg", start: "2026-08-14 14:00", end: "2026-08-14 17:00", tags: ["阅读活动", "能力拓展"], organizer: "市图书馆阅读推广中心", location: "武侯区图书馆三楼多功能厅", signup: "72/120", views: "1,860", eligible: true, custom: ["面向对象：全体在校学生"], masonryLines: ["适合人群：全体在校学生"], density: 3 },
+  { id: "a2", title: "校园绿色行动日：一起为校园种下一棵树", status: "报名中", category: "校园清洁志愿服务活动", format: "线下", time: "周末", points: 10, region: "222", subRegion: "金牛区", cover: "/assets/unsplash/mountains.jpg", start: "2026-08-16 09:00", end: "2026-08-16 12:00", tags: ["志愿服务", "素质提升活动"], organizer: "绿色校园社团", location: "金牛区青年公园东门", signup: "36/60", views: "980", eligible: true, custom: ["需自备水杯", "提供志愿服务证明"], masonryLines: ["报名截止：8月15日 18:00", "服务时长：3小时"], density: 5 },
+  { id: "a3", title: "青少年心理健康与情绪管理公益讲座", status: "即将开始", category: "讲座活动", format: "线上+线下", time: "明天", points: 2, region: "111", subRegion: "成华区", cover: "/assets/unsplash/volunteers.jpg", start: "2026-08-15 19:00", end: "2026-08-15 20:30", tags: ["心理健康", "公益科普"], organizer: "成华区文化馆", location: "成华区文化报告厅 · 同步直播", signup: "48/200", views: "760", eligible: true, custom: ["主讲人：刘老师", "支持线上回看"], density: 4 },
+  { id: "a4", title: "传统文化体验日：非遗手作与器物之美", status: "进行中", category: "能力拓展", format: "线下", time: "最近两周", points: 15, region: "666", subRegion: "青羊区", cover: "/assets/unsplash/culture.jpg", start: "2026-08-18 09:30", end: "2026-08-18 16:30", tags: ["传统文化", "手作体验", "非遗"], organizer: "青羊区文化馆", location: "青羊区文化中心工坊", signup: "18/30", views: "1,240", eligible: false, custom: ["包含三项手作体验", "材料包现场领取", "适合 12 岁以上参与"], masonryLines: ["活动亮点：三项手作体验", "材料包：现场领取", "适合年龄：12岁以上"], density: 6 },
+  { id: "a5", title: "青春在场：城市公共文化志愿服务培训", status: "即将开始", category: "素质提升活动", format: "线上", time: "近一个月", points: 8, region: "444", subRegion: "高新区", cover: "/assets/unsplash/students.jpg", start: "2026-08-21 14:00", end: "2026-08-21 16:00", tags: ["志愿服务", "线上培训"], organizer: "高新区青年发展中心", location: "线上活动 · 直播课堂", signup: "126/300", views: "654", eligible: true, custom: ["报名后获取直播链接"], density: 3 },
+  { id: "a6", title: "山河同读：人文与自然主题阅读计划", status: "报名中", category: "阅读活动", format: "线上+线下", time: "近三个月", points: 12, region: "555", subRegion: "武侯区", cover: "/assets/unsplash/mountains.jpg", start: "2026-09-01 10:00", end: "2026-09-30 18:00", tags: ["人文阅读", "自然教育"], organizer: "城市阅读联盟", location: "武侯区多所图书馆及线上社群", signup: "95/150", views: "2,416", eligible: true, custom: ["含四次主题导读", "结业可获电子证书"], masonryLines: ["计划周期：9月1日—9月30日", "完成四次导读即可结业"], density: 5 },
+  { id: "a7", title: "美好社区共创工作坊", status: "进行中", category: "普法教育活动", format: "线下", time: "最近一周", points: 6, region: "333", subRegion: "金牛区", cover: "/assets/unsplash/volunteers.jpg", start: "2026-08-17 10:00", end: "2026-08-17 12:00", tags: ["社区治理", "公众参与"], organizer: "金牛区社区学院", location: "金牛区邻里中心", signup: "24/40", views: "388", eligible: false, custom: [], density: 2 },
+  { id: "a8", title: "秋日校园摄影采风与影像叙事基础课", status: "已结束", category: "能力拓展", format: "线下", time: "全部", points: 10, region: "222", subRegion: "高新区", cover: "/assets/unsplash/culture.jpg", start: "2026-08-06 09:00", end: "2026-08-06 16:00", tags: ["影像创作", "校园美育"], organizer: "校园艺术中心", location: "高新区大学城创意空间", signup: "30/30", views: "1,045", eligible: false, custom: ["请自备拍摄设备"], density: 4 },
+  { id: "a9", title: "城市公共安全微课堂：应急技能入门", status: "即将开始", category: "普法教育活动", format: "线上", time: "今天", points: 3, region: "111", subRegion: "成华区", cover: "/assets/unsplash/students.jpg", start: "2026-08-14 19:30", end: "2026-08-14 20:30", tags: ["公共安全", "线上课堂"], organizer: "成华区应急服务中心", location: "线上直播间", signup: "156/240", views: "529", eligible: true, custom: ["直播结束后可查看回放"], density: 2 },
+  { id: "a10", title: "青年夜校 · 手机影像创作与城市漫游", status: "报名中", category: "能力拓展", format: "线下", time: "近一个月", points: 8, region: "444", subRegion: "高新区", cover: "/assets/unsplash/volunteers.jpg", start: "2026-08-28 18:30", end: "2026-08-28 21:00", tags: ["影像创作", "城市漫游", "夜校"], organizer: "高新区青年发展中心", location: "高新区城市会客厅", signup: "22/40", views: "876", eligible: true, custom: ["请携带可拍照的移动设备", "含一次户外采风"], masonryLines: ["课程形式：讲解 + 城市采风", "建议自备充电宝", "报名后发送集合地点"], density: 7 },
+  { id: "a11", title: "周末亲子科学实验室：一起发现身边的物理", status: "即将开始", category: "讲座活动", format: "线下", time: "周末", points: 5, region: "666", subRegion: "青羊区", cover: "/assets/unsplash/culture.jpg", start: "2026-08-23 10:00", end: "2026-08-23 11:30", tags: ["亲子活动", "科学启蒙"], organizer: "青羊区青少年宫", location: "青羊区科学体验馆", signup: "18/36", views: "462", eligible: true, custom: ["建议6—12岁儿童参与"], masonryLines: ["建议年龄：6—12岁", "每组限1位家长陪同"], density: 4 },
+  { id: "a12", title: "校园音乐午间场：轻松聆听室内乐", status: "进行中", category: "素质提升活动", format: "线下", time: "今天", points: 2, region: "333", subRegion: "武侯区", cover: "/assets/unsplash/students.jpg", start: "2026-08-14 12:20", end: "2026-08-14 13:00", tags: ["音乐欣赏", "校园美育"], organizer: "校园艺术中心", location: "武侯区大学生活动中心", signup: "64/100", views: "1,128", eligible: true, custom: [], density: 2 },
 ];
 
-const initialFilters = Object.fromEntries(filterRows.map(({ key }) => [key, "全部"]));
-
-function formatPoints(point) {
-  if (point === "自定义") return true;
-  const [min, max] = point.split("~").map(Number);
-  return (value) => value >= min && value <= max;
-}
-
-function StatusBadge({ status }) {
-  return <span className={`status status-${status}`}>{status}</span>;
-}
+function StatusBadge({ status }) { return <span className={`status status-${status}`}>{status}</span>; }
+function FilterRow({ row, filters, onChange }) { return <div className={`filter-row filter-row-${row.key}`}><span className="filter-label">{row.label}</span><div className="filter-options" role="group" aria-label={row.label}>{row.options.map((option) => <button key={option} className={filters[row.key] === option ? "active" : ""} type="button" aria-pressed={filters[row.key] === option} onClick={() => onChange(row.key, option)}>{option}</button>)}</div></div>; }
 
 function ActivityCard({ activity, view, onOpen }) {
-  const list = view === "list";
-  const masonry = view === "masonry";
-  return (
-    <article className={`activity-card ${list ? "activity-card-list" : ""} ${masonry ? "activity-card-masonry" : ""}`}>
-      <button className="card-hit" type="button" onClick={() => onOpen(activity)} aria-label={`查看活动：${activity.title}`}>
-        <div className="card-cover">
-          <img src={activity.cover} alt="" />
-          <StatusBadge status={activity.status} />
-          <div className="cover-stats"><span><LuUsers aria-hidden="true" />{activity.signup}</span><span><LuEye aria-hidden="true" />{activity.views}</span></div>
-        </div>
-        <div className="card-main">
-          <div className="card-title"><span className="top-tag">置顶</span><h2>{activity.title}</h2></div>
-          <p className="time"><LuCalendarDays aria-hidden="true" />{activity.start} <span>—</span> {activity.end}</p>
-          <div className="tag-row">{activity.tags.slice(0, masonry ? 4 : 2).map((tag) => <span key={tag}>{tag}</span>)}</div>
-          {list && <div className="list-extra"><p><strong>主办方：</strong>{activity.organizer}</p><p><strong>活动地点：</strong>{activity.location}</p></div>}
-          {masonry && activity.masonryLines?.map((line) => <p className="masonry-line" key={line}>{line}</p>)}
-          {!list && <div className="card-footer"><p>主办方：{activity.organizer}</p><p><LuMapPin aria-hidden="true" />{activity.location}</p></div>}
-        </div>
-        <span className="open-detail">查看详情 <LuChevronRight aria-hidden="true" /></span>
-      </button>
-    </article>
-  );
-}
-
-function Skeletons({ view }) {
-  return <div className={`skeletons ${view}`}>{Array.from({ length: view === "list" ? 3 : 5 }).map((_, index) => <div className="skeleton" key={index}><i /><b /><b /><small /></div>)}</div>;
+  const cover = <div className="card-cover"><img src={activity.cover} alt="" /><StatusBadge status={activity.status} /><div className="cover-stats"><span><LuUsers aria-hidden="true" />{activity.signup}</span><span><LuEye aria-hidden="true" />{activity.views}</span></div></div>;
+  const heading = <><div className="card-title"><span className="top-tag">置顶</span><h2>{activity.title}</h2></div><p className="time"><LuCalendarDays aria-hidden="true" />{activity.start}<span>—</span>{activity.end}</p></>;
+  if (view === "list") return <article className="activity-card activity-card-list"><button className="card-open" type="button" onClick={() => onOpen(activity)} aria-label={`查看活动详情：${activity.title}`}>{cover}<div className="list-body"><div className="card-main">{heading}<div className="tag-row">{activity.tags.slice(0, 2).map((tag) => <span key={tag}>{tag}</span>)}</div></div><div className="list-custom" aria-label="活动自定义字段">{activity.custom.map((item) => <p key={item}>{item}</p>)}{!activity.custom.length && <p>暂无补充字段</p>}</div><div className="list-basics"><p><strong>主办方：</strong>{activity.organizer}</p><p><strong>活动地点：</strong>{activity.location}</p></div></div></button></article>;
+  if (view === "masonry") return <article className="activity-card activity-card-masonry"><button className="card-open" type="button" onClick={() => onOpen(activity)} aria-label={`查看活动详情：${activity.title}`}>{cover}<div className="card-main">{heading}<div className="tag-row">{activity.tags.slice(0, 4).map((tag) => <span key={tag}>{tag}</span>)}</div>{activity.masonryLines?.map((line) => <p className="masonry-line" key={line}>{line}</p>)}<div className="masonry-footer"><p>主办方：{activity.organizer}</p><p><LuMapPin aria-hidden="true" />{activity.location}</p></div></div></button></article>;
+  return <article className="activity-card activity-card-grid"><button className="card-open" type="button" onClick={() => onOpen(activity)} aria-label={`查看活动详情：${activity.title}`}>{cover}<div className="card-main">{heading}<div className="grid-details-anchor"><div className="tag-row">{activity.tags.slice(0, 2).map((tag) => <span key={tag}>{tag}</span>)}</div><div className="grid-hover-details" aria-label="活动自定义字段"><div className="grid-custom">{(activity.masonryLines ?? activity.custom).map((item) => <p key={item}>{item}</p>)}{!(activity.masonryLines ?? activity.custom).length && <p>更多活动说明请进入详情查看</p>}</div><div className="grid-footer"><p>主办方：{activity.organizer}</p><p><LuMapPin aria-hidden="true" />{activity.location}</p></div></div></div><div className="grid-footer grid-footer-default"><p>主办方：{activity.organizer}</p><p><LuMapPin aria-hidden="true" />{activity.location}</p></div></div></button></article>;
 }
 
 function Masonry({ items, onOpen }) {
-  const columns = useMemo(() => {
-    const result = Array.from({ length: 5 }, () => ({ weight: 0, items: [] }));
-    items.forEach((item) => {
-      const column = result.reduce((shortest, current) => current.weight < shortest.weight ? current : shortest);
-      column.items.push(item);
-      column.weight += item.density;
-    });
-    return result;
-  }, [items]);
+  const columns = useMemo(() => { const result = Array.from({ length: 5 }, () => ({ weight: 0, items: [] })); items.forEach((item) => { const column = result.reduce((shortest, current) => current.weight < shortest.weight ? current : shortest); column.items.push(item); column.weight += item.density; }); return result; }, [items]);
   return <div className="masonry-grid">{columns.map((column, index) => <div className="masonry-column" key={index}>{column.items.map((item) => <ActivityCard activity={item} view="masonry" onOpen={onOpen} key={item.id} />)}</div>)}</div>;
 }
 
+function DetailDialog({ activity, onClose, onNotice }) { return <div className="dialog-backdrop" role="presentation" onMouseDown={onClose}><section className="detail-dialog" role="dialog" aria-modal="true" aria-labelledby="detail-title" onMouseDown={(event) => event.stopPropagation()}><button type="button" className="dialog-close" onClick={onClose} aria-label="关闭详情"><LuX /></button><img src={activity.cover} alt="" /><div><StatusBadge status={activity.status} /><h2 id="detail-title">{activity.title}</h2><p className="time"><LuCalendarDays aria-hidden="true" />{activity.start} — {activity.end}</p><p><strong>主办方：</strong>{activity.organizer}</p><p><strong>活动地点：</strong>{activity.location}</p>{activity.custom.map((item) => <p key={item}>{item}</p>)}<button className="primary-action" type="button" onClick={() => onNotice("原型已记录查看详情操作；真实环境将跳转至现有活动详情页。")}>进入活动详情</button></div></section></div>; }
+
+function DesktopPlaza({ filters, keyword, setKeyword, refresh, setFilter, dateRange, setDateRange, moreOpen, setMoreOpen, customPoints, setCustomPoints, view, setView, eligibleOnly, setEligibleOnly, results, activeFilters, clearFilter, reset, setSelected, onOpenMyActivities }) {
+  const viewOptions = [{ key: "list", label: "列表视图", icon: LuLayoutList }, { key: "grid", label: "卡片网格布局", icon: LuGrid2X2 }, { key: "masonry", label: "瀑布流布局", icon: LuColumns3 }];
+  return <main className="desktop-plaza app-shell"><header className="page-header"><label className="search"><input value={keyword} onChange={(event) => setKeyword(event.target.value)} onKeyDown={(event) => event.key === "Enter" && refresh()} placeholder="搜索活动名称、主办方或地点" aria-label="搜索活动名称、主办方或地点" />{keyword && <button className="clear-search" type="button" aria-label="清空搜索" onClick={() => { setKeyword(""); refresh(); }}><LuX /></button>}<button className="search-submit" type="button" aria-label="搜索活动" onClick={refresh}><LuSearch aria-hidden="true" /></button></label><button className="my-activities" type="button" onClick={onOpenMyActivities}><LuUser aria-hidden="true" />我的活动</button></header><section className="filter-panel" aria-label="活动筛选"><div className="filter-heading"><div><h1>从你关心的条件开始筛选</h1><p>常用条件已展开，其他条件可按需补充。</p></div><span>{moreOpen ? "已展开更多条件" : "4 个常用条件"}</span></div><div className="filter-stack">{primaryFilters.map((row) => <FilterRow row={row} filters={filters} onChange={setFilter} key={row.key} />)}</div>{filters.time === "选择日期" && <div className="conditional-fields date-fields" aria-label="自定义活动日期"><LuCalendarRange aria-hidden="true" /><span>活动日期</span><label>从<input className={dateRange.from ? "has-value" : ""} type="date" value={dateRange.from} onChange={(event) => { setDateRange((current) => ({ ...current, from: event.target.value })); refresh(); }} /></label><label>到<input className={dateRange.to ? "has-value" : ""} type="date" value={dateRange.to} onChange={(event) => { setDateRange((current) => ({ ...current, to: event.target.value })); refresh(); }} /></label></div>}<button className="more-filters" type="button" aria-expanded={moreOpen} onClick={() => setMoreOpen((open) => !open)}><LuSlidersHorizontal aria-hidden="true" />{moreOpen ? "收起更多筛选" : "更多筛选"}{moreOpen ? <LuChevronUp aria-hidden="true" /> : <LuChevronDown aria-hidden="true" />}</button>{moreOpen && <div className="more-filter-stack">{extendedFilters.map((row) => <FilterRow row={row} filters={filters} onChange={setFilter} key={row.key} />)}</div>}{moreOpen && filters.points === "自定义" && <div className="conditional-fields points-fields" aria-label="自定义考核积分"><span>考核积分</span><div className="points-range"><input type="number" min="0" placeholder="最低" aria-label="最低考核积分" value={customPoints.min} onChange={(event) => { setCustomPoints((current) => ({ ...current, min: event.target.value })); refresh(); }} /><em>分</em><i aria-hidden="true">—</i><input type="number" min="0" placeholder="最高" aria-label="最高考核积分" value={customPoints.max} onChange={(event) => { setCustomPoints((current) => ({ ...current, max: event.target.value })); refresh(); }} /><em>分</em></div></div>}</section><section className="result-toolbar" aria-label="结果工具栏"><div className="result-summary"><strong>共 {results.length} 个活动</strong><span>按条件实时更新</span></div><div className="toolbar-actions"><label className="eligible"><input checked={eligibleOnly} onChange={(event) => { setEligibleOnly(event.target.checked); refresh(); }} type="checkbox" /> <span>我能报名</span></label><div className="view-switch" role="group" aria-label="切换活动展示视图">{viewOptions.map(({ key, label, icon: Icon }) => <button className={view === key ? "active" : ""} type="button" key={key} aria-label={label} aria-pressed={view === key} onClick={() => setView(key)}><Icon aria-hidden="true" /></button>)}</div></div></section>{activeFilters.length > 0 && <section className="selected-conditions" aria-label="已选筛选条件"><span>已选条件</span><div>{activeFilters.map((filter) => <button type="button" key={filter.key} onClick={() => clearFilter(filter.key)}>{filter.label}<LuX aria-hidden="true" /></button>)}<button className="clear-all" type="button" onClick={reset}><LuRotateCcw aria-hidden="true" />清空全部</button></div></section>}{results.length === 0 ? <section className="empty-state"><div className="empty-icon"><LuSearch /></div><h2>未找到符合条件的活动</h2><p>请删除部分筛选条件，或换一个关键词再试。</p><button type="button" onClick={reset}>清除全部条件</button></section> : view === "masonry" ? <Masonry items={results} onOpen={setSelected} /> : <section className={`activity-grid ${view}`}>{results.map((activity) => <ActivityCard key={activity.id} activity={activity} view={view} onOpen={setSelected} />)}</section>}</main>;
+}
+
 export function App() {
+  const [route, setRoute] = useState(() => window.location.hash === "#my-activities" ? "my-activities" : "plaza");
   const [filters, setFilters] = useState(initialFilters);
   const [keyword, setKeyword] = useState("");
-  const [view, setView] = useState("grid");
+  const [view, setView] = useState(() => window.matchMedia?.("(max-width: 767px)").matches ? "list" : "grid");
   const [eligibleOnly, setEligibleOnly] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [dateRange, setDateRange] = useState({ from: "", to: "" });
+  const [customPoints, setCustomPoints] = useState({ min: "", max: "" });
   const [selected, setSelected] = useState(null);
   const [notice, setNotice] = useState("");
 
-  const refresh = () => {
-    setLoading(true);
-    window.setTimeout(() => setLoading(false), 260);
-  };
-  const setFilter = (key, value) => {
-    setFilters((current) => ({ ...current, [key]: value }));
-    refresh();
-  };
-  const reset = () => {
-    setFilters(initialFilters);
-    setKeyword("");
-    setEligibleOnly(false);
-    refresh();
-  };
-  const hasConditions = keyword || eligibleOnly || Object.values(filters).some((value) => value !== "全部");
-  const results = useMemo(() => activities.filter((activity) => {
-    const matchText = !keyword || [activity.title, activity.organizer, activity.location, ...activity.tags].join(" ").toLowerCase().includes(keyword.toLowerCase().trim());
-    const match = (key, value) => filters[key] === "全部" || value === filters[key];
-    const pointRule = filters.points === "全部" || formatPoints(filters.points) === true || formatPoints(filters.points)(activity.points);
-    return matchText && match("format", activity.format) && match("status", activity.status) && match("category", activity.category) && match("time", activity.time) && pointRule && match("region", activity.region) && match("subRegion", activity.subRegion) && (!eligibleOnly || activity.eligible);
-  }), [filters, keyword, eligibleOnly]);
+  useEffect(() => { const syncRoute = () => setRoute(window.location.hash === "#my-activities" ? "my-activities" : "plaza"); window.addEventListener("hashchange", syncRoute); return () => window.removeEventListener("hashchange", syncRoute); }, []);
+  useEffect(() => { const topNav = document.querySelector(".page-header"); const syncTopNav = () => topNav?.classList.toggle("is-stuck", window.scrollY > 0); syncTopNav(); window.addEventListener("scroll", syncTopNav, { passive: true }); return () => window.removeEventListener("scroll", syncTopNav); }, []);
 
-  const viewOptions = [
-    { key: "list", label: "列表视图", icon: LuLayoutList },
-    { key: "grid", label: "卡片网格布局", icon: LuGrid2X2 },
-    { key: "masonry", label: "瀑布流布局", icon: LuColumns3 },
-  ];
+  const refresh = () => window.setTimeout(() => undefined, 0);
+  const setFilter = (key, value) => { setFilters((current) => { const next = { ...current, [key]: value }; if (key === "region" && value !== "全部" && current.subRegion !== "全部" && !availableSubRegions[value]?.includes(current.subRegion)) next.subRegion = "全部"; return next; }); refresh(); };
+  const clearFilter = (key) => { setFilters((current) => ({ ...current, [key]: "全部" })); if (key === "time") setDateRange({ from: "", to: "" }); if (key === "points") setCustomPoints({ min: "", max: "" }); if (key === "eligible") setEligibleOnly(false); refresh(); };
+  const reset = () => { setFilters(initialFilters); setKeyword(""); setEligibleOnly(false); setDateRange({ from: "", to: "" }); setCustomPoints({ min: "", max: "" }); refresh(); };
+  const activeFilters = useMemo(() => [...allFilters.filter((row) => filters[row.key] !== "全部").map((row) => ({ key: row.key, label: `${row.label} · ${filters[row.key]}` })), ...(eligibleOnly ? [{ key: "eligible", label: "我能报名" }] : [])], [filters, eligibleOnly]);
+  const results = useMemo(() => activities.filter((activity) => { const matchText = !keyword || [activity.title, activity.organizer, activity.location, ...activity.tags].join(" ").toLowerCase().includes(keyword.toLowerCase().trim()); const matches = (key, value) => filters[key] === "全部" || filters[key] === "选择日期" || value === filters[key]; const points = filters.points === "全部" ? true : filters.points === "自定义" ? (!customPoints.min || activity.points >= Number(customPoints.min)) && (!customPoints.max || activity.points <= Number(customPoints.max)) : (() => { const [min, max] = filters.points.split("~").map(Number); return activity.points >= min && activity.points <= max; })(); const date = activity.start.slice(0, 10); const dates = filters.time !== "选择日期" || (!dateRange.from && !dateRange.to) || (!dateRange.from || date >= dateRange.from) && (!dateRange.to || date <= dateRange.to); return matchText && matches("format", activity.format) && matches("status", activity.status) && matches("category", activity.category) && matches("time", activity.time) && points && matches("region", activity.region) && matches("subRegion", activity.subRegion) && dates && (!eligibleOnly || activity.eligible); }), [filters, keyword, eligibleOnly, dateRange, customPoints]);
+  const viewOptions = [{ key: "list", label: "列表视图", icon: LuLayoutList }, { key: "grid", label: "卡片网格布局", icon: LuGrid2X2 }, { key: "masonry", label: "瀑布流布局", icon: LuColumns3 }];
+  const openMyActivities = () => { window.location.hash = "my-activities"; };
 
-  return <main className="app-shell">
-    <header className="page-header">
-      <label className="search"><input value={keyword} onChange={(event) => setKeyword(event.target.value)} onKeyDown={(event) => event.key === "Enter" && refresh()} placeholder="搜索活动名称" aria-label="搜索活动名称、主办方或地点" />{keyword && <button className="clear-search" type="button" aria-label="清空搜索" onClick={() => { setKeyword(""); refresh(); }}><LuX /></button>}<button className="search-submit" type="button" aria-label="搜索活动" onClick={refresh}><LuSearch aria-hidden="true" /></button></label>
-      <button className="my-activities" type="button" onClick={() => setNotice("“我的活动”会沿用现有业务登录与跳转流程。")}><LuUser aria-hidden="true" />我的活动</button>
-    </header>
-
-    <section className="filter-panel" aria-label="活动筛选">
-      {filterRows.map((row) => <div className="filter-row" key={row.key}>
-        <span className="filter-label">{row.label}</span>
-        <div className="filter-options" role="group" aria-label={row.label}>{row.options.map((option) => {
-          const active = filters[row.key] === option;
-          return <button key={option} className={active ? "active" : ""} type="button" aria-pressed={active} onClick={() => setFilter(row.key, option)}>{option}</button>;
-        })}</div>
-      </div>)}
-    </section>
-
-    <section className="result-toolbar" aria-label="结果工具栏">
-      <div className="result-summary"><strong>共 {results.length} 个活动</strong>{hasConditions && <button className="reset" onClick={reset} type="button"><LuRotateCcw aria-hidden="true" />重置筛选</button>}</div>
-      <div className="toolbar-actions"><label className="eligible"><input checked={eligibleOnly} onChange={(event) => { setEligibleOnly(event.target.checked); refresh(); }} type="checkbox" /> <span>我能报名</span></label><div className="view-switch" role="group" aria-label="切换活动展示视图">{viewOptions.map(({ key, label, icon: Icon }) => <button className={view === key ? "active" : ""} type="button" key={key} aria-label={label} aria-pressed={view === key} onClick={() => setView(key)}><Icon aria-hidden="true" /></button>)}</div></div>
-    </section>
-
-    {loading ? <Skeletons view={view} /> : results.length === 0 ? <section className="empty-state"><div className="empty-icon"><LuSearch /></div><h2>未找到符合条件的活动</h2><p>请尝试调整关键词或筛选条件。</p><button type="button" onClick={reset}>清除全部条件</button></section> : view === "masonry" ? <Masonry items={results} onOpen={setSelected} /> : <section className={`activity-grid ${view}`}>{results.map((activity) => <ActivityCard key={activity.id} activity={activity} view={view} onOpen={setSelected} />)}</section>}
-
-    {selected && <div className="dialog-backdrop" role="presentation" onMouseDown={() => setSelected(null)}><section className="detail-dialog" role="dialog" aria-modal="true" aria-labelledby="detail-title" onMouseDown={(event) => event.stopPropagation()}><button type="button" className="dialog-close" onClick={() => setSelected(null)} aria-label="关闭详情"><LuX /></button><img src={selected.cover} alt="" /><div><StatusBadge status={selected.status} /><h2 id="detail-title">{selected.title}</h2><p className="time"><LuCalendarDays aria-hidden="true" />{selected.start} — {selected.end}</p><p><strong>主办方：</strong>{selected.organizer}</p><p><strong>活动地点：</strong>{selected.location}</p>{selected.custom.map((item) => <p key={item}>{item}</p>)}<button className="primary-action" type="button" onClick={() => setNotice("原型已记录查看详情操作；真实环境将跳转至现有活动详情页。")} >进入活动详情 <LuChevronRight /></button></div></section></div>}
-    {notice && <div className="toast" role="status">{notice}<button type="button" aria-label="关闭提示" onClick={() => setNotice("")}><LuX /></button></div>}
-  </main>;
+  if (route === "my-activities") return <MyActivitiesPage />;
+  return <><MobilePlaza filters={filters} setFilters={setFilters} keyword={keyword} setKeyword={setKeyword} refresh={refresh} view={view} setView={setView} viewOptions={viewOptions} results={results} eligibleOnly={eligibleOnly} setEligibleOnly={setEligibleOnly} dateRange={dateRange} setDateRange={setDateRange} customPoints={customPoints} setCustomPoints={setCustomPoints} primaryFilters={primaryFilters} extendedFilters={extendedFilters} availableSubRegions={availableSubRegions} onOpenActivity={setSelected} onOpenMyActivities={openMyActivities} /><DesktopPlaza filters={filters} keyword={keyword} setKeyword={setKeyword} refresh={refresh} setFilter={setFilter} dateRange={dateRange} setDateRange={setDateRange} moreOpen={moreOpen} setMoreOpen={setMoreOpen} customPoints={customPoints} setCustomPoints={setCustomPoints} view={view} setView={setView} eligibleOnly={eligibleOnly} setEligibleOnly={setEligibleOnly} results={results} activeFilters={activeFilters} clearFilter={clearFilter} reset={reset} setSelected={setSelected} onOpenMyActivities={openMyActivities} />{selected && <DetailDialog activity={selected} onClose={() => setSelected(null)} onNotice={setNotice} />}{notice && <div className="toast" role="status">{notice}<button type="button" aria-label="关闭提示" onClick={() => setNotice("")}><LuX /></button></div>}</>;
 }

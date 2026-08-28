@@ -2,6 +2,10 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App.jsx";
 import "./styles.css";
+import "./layout-refinements.css";
+import "./card-view-refinements.css";
+import "./my-activities.css";
+import "./mobile.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

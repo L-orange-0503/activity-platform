@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 2,
+  "components": [
+    {
+      "name": "Search field",
+      "kind": "input",
+      "refersTo": "search-input",
+      "description": "A compact 40px trailing-icon search control shared by the plaza and personal-activity toolbar.",
+      "html": "<label class=\\"ds-search\\"><input aria-label=\\"搜索活动名称\\" placeholder=\\"搜索活动名称\\"><button aria-label=\\"搜索\\">⌕</button></label>",
+      "css": ".ds-search{display:flex;align-items:center;width:360px;height:40px;padding-left:14px;border:1px solid #d9dee6;border-radius:8px;color:#172b4d;background:#fff}.ds-search:hover{background:#f5f6f8}.ds-search:focus-within{border-color:#1769ff}.ds-search input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:#172b4d;font:14px/20px Inter,system-ui,sans-serif}.ds-search input::placeholder{color:#9aa3af}.ds-search button{width:42px;height:38px;border:0;color:#8993a0;background:transparent;font-size:20px}.ds-search button:hover,.ds-search button:focus-visible{color:#1769ff;outline:2px solid #1769ff;outline-offset:-2px}"
+    },
+    {
+      "name": "Segmented control",
+      "kind": "nav",
+      "refersTo": "segmented-control",
+      "description": "Peer content categories presented as one muted group with an inset selected segment.",
+      "html": "<div class=\\"ds-segmented\\" role=\\"tablist\\"><button role=\\"tab\\" aria-selected=\\"true\\">我报名的</button><button role=\\"tab\\">我收藏的</button><button role=\\"tab\\">我管理的</button></div>",
+      "css": ".ds-segmented{display:inline-flex;gap:4px;padding:4px;border-radius:8px;background:#f1f4f8}.ds-segmented button{height:32px;padding:0 16px;border:0;border-radius:6px;color:#617187;background:transparent;font:600 14px/20px Inter,system-ui,sans-serif}.ds-segmented button:hover{color:#1769ff;background:#edf4ff}.ds-segmented button[aria-selected=\\"true\\"]{color:#172b4d;background:#fff;box-shadow:0 2px 6px rgba(39,71,116,.12)}.ds-segmented button:focus-visible{outline:2px solid #1769ff;outline-offset:2px}"
+    },
+    {
+      "name": "Activity status tag",
+      "kind": "chip",
+      "refersTo": "status-tag",
+      "description": "Semantic solid state tag repeated over activity covers.",
+      "html": "<span class=\\"ds-status\\">进行中</span>",
+      "css": ".ds-status{display:inline-flex;align-items:center;padding:4px 8px;border-radius:6px;color:#fff;background:#2ea96b;box-shadow:0 1px 2px rgba(0,0,0,.12);font:650 12px/16px Inter,system-ui,sans-serif}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Institutional Clarity",
+    "overview": "A restrained desktop activity system with shared photographic page field and quiet white working surfaces.",
+    "keyCharacteristics": ["Shared white surfaces", "Institutional blue decisions", "Stable hover and focus feedback"],
+    "rules": [
+      { "name": "Shared-Surface Rule", "body": "Related routes reuse the same background, search, cards, tags, typography, and focus language.", "section": "overview" },
+      { "name": "Stable-Gutter Rule", "body": "Full-width headers and fixed content columns preserve the plaza page field.", "section": "layout" },
+      { "name": "Quiet-Lift Rule", "body": "Depth appears only on interaction or layered content.", "section": "elevation" }
+    ],
+    "dos": ["Reuse plaza components across related routes.", "Reveal hover actions for keyboard focus too."],
+    "donts": ["Create a separate gray visual theme.", "Move list rows to reveal information."]
+  }
+}

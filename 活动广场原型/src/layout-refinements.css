@@ -1,0 +1,298 @@
+/* Plan B refinement: keep the filter surface focused on selectable conditions. */
+.filter-heading {
+  display: none;
+}
+
+.filter-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0 0;
+}
+
+.filter-stack {
+  order: 1;
+}
+
+/* Keep the primary dimensions close to the next filtering layer. */
+.filter-panel > .filter-stack {
+  padding-bottom: 0;
+}
+
+.filter-stack:has(+ .conditional-fields) {
+  padding-bottom: 0;
+}
+
+.conditional-fields:not(.points-fields) {
+  order: 2;
+}
+
+.more-filter-stack {
+  display: contents;
+}
+
+.points-fields {
+  order: 4;
+}
+
+.more-filters {
+  order: 7;
+}
+
+/* More conditions follow the same uninterrupted rhythm as the primary rows. */
+.filter-row-points {
+  order: 3;
+}
+
+.filter-row-region {
+  order: 5;
+}
+
+.filter-row-subRegion {
+  order: 6;
+}
+
+.more-filter-stack + .points-fields {
+  border-top: 0;
+}
+
+.filter-panel .conditional-fields {
+  min-height: 50px;
+  display: grid;
+  grid-template-columns: 154px max-content max-content max-content;
+  align-items: center;
+  column-gap: 12px;
+  padding: 6px 0;
+  border-top: 0;
+  background: transparent;
+  font-size: 14px;
+}
+
+.filter-panel .conditional-fields input {
+  font-size: 14px;
+}
+
+.conditional-fields > svg {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: start;
+  margin-left: 0;
+}
+
+.conditional-fields > span {
+  grid-column: 2;
+  grid-row: 1;
+  padding-left: 32px;
+  font-weight: 400;
+}
+
+.conditional-fields label:first-of-type {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.conditional-fields label:last-of-type {
+  grid-column: 4;
+  grid-row: 1;
+}
+
+.points-fields > span {
+  padding-left: 0;
+}
+
+.date-fields > span {
+  padding-left: 20px;
+}
+
+.points-fields .points-range {
+  grid-column: 3 / -1;
+  grid-row: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.points-fields .points-range input {
+  width: 78px;
+}
+
+.points-fields .points-range em {
+  color: #35445a;
+  font-style: normal;
+}
+
+.points-fields .points-range i {
+  color: #96a4b7;
+  font-style: normal;
+}
+
+.date-fields label {
+  gap: 12px;
+}
+
+.date-fields input {
+  color: #9aa8b9;
+}
+
+.date-fields input::-webkit-datetime-edit {
+  color: #9aa8b9;
+}
+
+.date-fields input::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  filter: invert(68%) sepia(12%) saturate(650%) hue-rotate(178deg) brightness(88%) contrast(87%);
+}
+
+.date-fields input.has-value,
+.date-fields input.has-value::-webkit-datetime-edit {
+  color: #334861;
+}
+
+.date-fields input.has-value::-webkit-calendar-picker-indicator {
+  filter: invert(25%) sepia(16%) saturate(1174%) hue-rotate(176deg) brightness(92%) contrast(91%);
+}
+
+.points-fields input::placeholder {
+  color: #9aa8b9;
+}
+
+.view-switch {
+  overflow: visible;
+}
+
+.view-switch button:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.view-switch button:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+/* Top navigation shares the activity plaza's content gutter. */
+.app-shell {
+  padding-top: 0;
+}
+
+.page-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  width: auto;
+  height: 68px;
+  margin: 0 -72px 28px;
+  padding: 0 72px;
+  display: grid;
+  grid-template-columns: 1fr minmax(360px, 520px) 1fr;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, .08);
+  background: rgba(255, 255, 255, .36);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: background-color .2s ease, box-shadow .2s ease;
+}
+
+.page-header.is-stuck {
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(35, 52, 78, .04);
+}
+
+.page-header::before {
+  content: "活动广场";
+  grid-column: 1;
+  justify-self: start;
+  width: auto;
+  height: 26px;
+  color: #173f7a;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: -.04em;
+}
+
+.page-header .search {
+  grid-column: 2;
+  justify-self: center;
+  width: min(520px, 100%);
+  height: 40px;
+  padding-left: 14px;
+  overflow: hidden;
+  border: 1px solid #d9dee6;
+  border-radius: 8px;
+  color: #8993a0;
+  background: rgba(255, 255, 255, .3);
+  box-shadow: none;
+}
+
+.page-header .search:hover {
+  background: #f5f6f8;
+}
+
+.page-header .search:focus-within {
+  border-color: #1769ff;
+  background: rgba(255, 255, 255, .3);
+  box-shadow: none;
+}
+
+.page-header .search input:focus-visible {
+  outline: 0;
+}
+
+.page-header .search input {
+  font-size: 14px;
+}
+
+.page-header .search input::placeholder {
+  color: #9aa3af;
+}
+
+.page-header .search .search-submit {
+  width: 42px;
+  color: #8993a0;
+  background: transparent;
+}
+
+.page-header .search-submit:hover {
+  color: #596a80;
+  background: transparent;
+}
+
+.page-header .search-submit svg {
+  width: 18px;
+  height: 18px;
+}
+
+.page-header .my-activities {
+  grid-column: 3;
+  justify-self: end;
+  color: #1769ff;
+}
+
+.page-header .my-activities:hover {
+  color: #0a55da;
+}
+
+body {
+  background-color: #fff;
+  background-image: url("/@fs/Users/lishijiedemac/Documents/图片库/设计素材.library/images/MSWO4M1EBL1HW.info/百度智能云千帆社区.png");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  background-attachment: fixed;
+}
+
+.app-shell {
+  background: transparent;
+}
+
+.activity-card,
+.activity-card:hover,
+.activity-card:focus-within {
+  border-color: rgba(226, 232, 240, .3);
+}
+
+@media (max-width: 1365px) {
+  .page-header {
+    margin-inline: -48px;
+    padding-inline: 48px;
+    grid-template-columns: 1fr minmax(320px, 420px) 1fr;
+  }
+}

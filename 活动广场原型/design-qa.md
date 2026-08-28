@@ -1,34 +1,50 @@
-# 设计验收记录
+# My Activities Mobile Design QA
 
-## 对照基准
+## Comparison target
 
-- 视觉基准：`/Users/lishijiedemac/.codex/generated_images/019fff38-79f1-7cc0-a875-b2556134610b/exec-6efda018-b11e-408d-8fcf-7c8450eb61bc.png`
-- 实现截图：`/Users/lishijiedemac/Documents/ChatGPT/活动优化方案/活动广场原型/implementation-1920.png`
-- CSS 视口：1920 × 1080；对照截图使用同一桌面视口采集。两张栅格图的导出像素尺寸受浏览器渲染缩放影响，按页面边距、信息密度和组件尺寸比例进行归一化比较。
-- 对照状态：默认筛选（七个维度均为“全部”）、卡片宫格视图、无弹窗、无搜索关键词。
+- Source visual truth: Figma node `488:20592` from `https://www.figma.com/design/isvkUMxUZBinHaSnvN1VdC/Untitled?node-id=488-20592`; exported source capture at `/tmp/my-activities-legacy-mobile.png` (375 × 1129 px).
+- Implementation route: `http://192.168.1.0:5173/#my-activities`.
+- Intended viewport: 375 × 812 CSS px, device scale factor not overridden.
+- State compared: default “我报名的” category. The implementation intentionally replaces the source's two categories with the confirmed PC-derived three categories and adds the confirmed activity-location field.
 
-## 全页对照
+## Evidence captured
 
-- 顶部：保留“活动广场 + 搜索 + 我的活动”的单行结构，导航与筛选区之间维持清晰层级。
-- 筛选：七个筛选维度均为同一行高、标签宽度、分隔线和选中胶囊样式；不再出现分组底色、勾选图标或任何主从层级暗示。
-- 内容：结果工具栏、可报名开关、三种视图控制和五列卡片栅格与基准结构一致。
-- 卡片：封面、状态、统计、标题、时间、标签、主办方与地点沿同一信息优先级展开；图片替换为用户要求的 Unsplash 语义占位图（本地文件，宽度 900px）。
+- Browser-rendered DOM confirmed the 375px mobile route has the Figma-derived header anatomy: return control, centered “应用标题”, plus control, search field, and compact category pills.
+- Browser-rendered DOM confirmed six “我报名的” cards, including time and location fields; “报名审核中” has no action controls.
+- Interaction checks passed: “我收藏的” renders 6 direct “取消收藏” controls; an over-three-action joined card renders 3 direct actions plus a left “更多” control, whose menu contains “活动评价”.
+- Internal scrolling check passed: `.my-mobile-scroll` reported `scrollTop: 357`, `scrollHeight: 1027`, `clientHeight: 670`, while the fixed header remained at `top: 0` and the page scroll position remained `0`.
+- Console check: no warning or error entries.
 
-## 聚焦区域
+## Screenshot limitation
 
-筛选面板和首行卡片是本次主要验收区域：选项在首屏内保持可扫读的横向节奏；卡片封面比例、标题两行截断与次要字段的弱化满足原方案的浏览密度目标。
+The selected in-app browser can render and interact with the local route, but its documented screenshot API returned “Unable to capture screenshot” on both a normal and an explicit 375 × 812 clip attempt. No alternative browser surface was used, so a side-by-side image comparison cannot be completed in this run.
 
-## 迭代记录
+## Findings
 
-1. [P2，已修复] 初版将部分筛选行置于不同视觉容器，造成七个维度像存在分组。现已统一为七个平级筛选行。
-2. [P2，已修复] 选中项内的勾选图标强化了额外层级，和基准的轻量选中态不一致。现仅使用浅蓝底、蓝色文字和细边框表达选中。
-3. [P3，接受] 封面图由原视觉稿中的插画替换为 Unsplash 摄影占位图；这是为满足“直接下载、不生成、宽度小于 1000px”的指定要求，内容语义对应活动主题。
+- [P1] Visual pixel comparison remains unverified.
+  Location: full mobile page.
+  Evidence: source export is available, but the selected in-app browser could not produce an implementation screenshot.
+  Impact: typography, exact spacing, colors, imagery crop, and copy cannot be signed off from a normalized visual pair.
+  Fix: capture the rendered 375px route from the selected browser when its screenshot capability is available, then compare it with the source export and record any necessary follow-up adjustments.
 
-## 功能与工程检查
+## Required fidelity surfaces
 
-- `pnpm run build`：通过。
-- `pnpm run test:sites`：4 / 4 通过。
-- 已验证：筛选、搜索、可报名开关、宫格／列表／瀑布流切换、卡片详情弹窗、空状态与重置操作。
-- 浏览器控制台：未发现 error 级别错误。
+| Surface | Status |
+|---|---|
+| Fonts and typography | Blocked from pixel comparison; implementation uses the source-aligned PingFang SC fallback and documented sizes. |
+| Spacing and layout rhythm | Functionally verified through DOM and scroll measurements; visual pixel sign-off blocked. |
+| Colors and visual tokens | Implemented from Figma-derived white, `#F6F7FB`, `#2663FF`, and muted gray values; visual sign-off blocked. |
+| Image quality and asset fidelity | Existing local Unsplash covers are intentionally reused from the current PC page per PRD; crop comparison blocked. |
+| Copy and content | Verified in DOM: PC-derived three categories and fields are present; the old header's “应用标题” is preserved. |
 
-final result: passed
+## Implementation checklist
+
+- [x] Implement the 375px mobile route and fixed Figma-derived header framework.
+- [x] Add the three PC-derived categories with six static records each.
+- [x] Add internal list scrolling, location fields, action overflow, review-state suppression, and floating scan/check-in control.
+- [x] Verify production build, Sites packaging tests, DOM state, key interactions, internal scroll, and console output.
+- [ ] Capture a browser-rendered 375px implementation screenshot and complete normalized pixel comparison.
+
+## Final result
+
+final result: blocked
